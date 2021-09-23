@@ -1,2 +1,12 @@
 # Environment files
 *env
+
+# Cache files
+.pytest_cache
+__pycache__
+
+# Test and coverage files
+.coverage
+htmlcov
+coverage.json
+coverage.xml
