@@ -4,7 +4,7 @@ from Presentation.Errors.ValidationError import ValidationError
 
 class SignUpController:
     def handle(self, message: Message):
-        required_fields = ['name', 'email']
+        required_fields = ['name', 'email', 'password']
 
         for field in required_fields: 
             if not message.body.get(field):
