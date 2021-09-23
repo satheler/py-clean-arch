@@ -4,10 +4,8 @@ from Presentation.Errors.ValidationError import ValidationError
 
 class SignUpController:
     def handle(self, message: Message):
-        if not message.body.get('name'):
-            raise ValidationError({'name': ['is required']})
-        
-        if not message.body.get('email'):
-            raise ValidationError({'email': ['is required']})
-        
+        required_fields = ['name', 'email']
 
+        for field in required_fields: 
+            if not message.body.get(field):
+                raise ValidationError({field: ['is required']})
