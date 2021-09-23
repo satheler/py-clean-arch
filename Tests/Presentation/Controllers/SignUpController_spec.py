@@ -1,0 +1,17 @@
+import pytest
+from Core.Message import Message
+from Presentation.Controllers.SignUpController import SignUpController
+from Presentation.Errors.ValidationError import ValidationError
+
+def test_when_no_name_is_provided():
+    """Should return an ValidationException if no name is provided """
+    sut = SignUpController()
+    message = Message({
+      'name': 'any_name',
+      'email': 'any_email@mail.com',
+      'password': 'any_password',
+      'password_confirmation': 'any_password'
+    })
+
+    with pytest.raises(ValidationError):
+      sut.handle(message)

@@ -1,3 +1,7 @@
+# -- PYTHON PACKAGE REQUIREMENTS:
+# USE: pip install -r requirements.txt
+
+autopep8==1.5.7
 coverage==5.5
 pylint==2.11.1
 pep8==1.7.1
