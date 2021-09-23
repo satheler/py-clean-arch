@@ -1,3 +1,9 @@
+# OS Files
+.DS_Store
+
+# Local files
+~*
+
 # Environment files
 *env
 
@@ -10,3 +16,10 @@ __pycache__
 htmlcov
 coverage.json
 coverage.xml
+
+# Text editor and Editor files
+.vscode
+
+# Build files
+package
+build
