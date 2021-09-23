@@ -32,3 +32,17 @@ def test_when_no_email_is_provided():
       sut.handle(message)
 
     assert {'email': 'is required'} in result.value.errors
+
+def test_when_no_password_is_provided():
+    """Should return an ValidationException if no password is provided """
+    sut = SignUpController()
+    message = Message({
+      'name': 'any_name',
+      'email': 'any_email@mail.com',
+      'password_confirmation': 'any_password'
+    })
+
+    with pytest.raises(ValidationError) as result:
+      sut.handle(message)
+
+    assert {'password': 'is required'} in result.value.errors
