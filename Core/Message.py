@@ -1,4 +1,3 @@
-from typing import Dict
 from os import environ
 
 
