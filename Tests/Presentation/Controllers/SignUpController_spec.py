@@ -109,3 +109,22 @@ def test_when_invalid_email_is_provided(mocker: MockerFixture):
         sut.handle(message)
 
     assert {'email': 'is invalid'} in result.value.errors
+
+def test_call_email_validator_with_correct_values(mocker: MockerFixture):
+    """Should call EmailValidator with correct email"""
+    test = make_sut()
+    sut = test.get('sut')
+    email_validator_stub = test.get('email_validator_stub')
+    
+    email_validator_spy = mocker.spy(email_validator_stub, 'is_valid')
+
+    message = Message({
+        'name': 'any_name',
+        'email': 'any_email@mail.com',
+        'password': 'any_password',
+        'password_confirmation': 'any_password'
+    })
+
+    sut.handle(message)
+
+    email_validator_spy.assert_called_with(message.body.get('email'))
