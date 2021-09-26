@@ -93,12 +93,30 @@ def test_when_no_password_confirmation_is_provided():
     assert {'password_confirmation': 'is required'} in result.value.errors
 
 
+def test_when_password_confirmation_fails():
+    """Should return a ValidationException if password_confirmation is different from password"""
+    test = make_sut()
+    sut = test.get('sut')
+
+    message = Message({
+        'name': 'any_name',
+        'email': 'any_email@mail.com',
+        'password': 'any_password',
+        'password_confirmation': 'invalid_password'
+    })
+
+    with pytest.raises(ValidationError) as result:
+        sut.handle(message)
+
+    assert {'password_confirmation': 'does not match with password'} in result.value.errors
+
+
 def test_when_invalid_email_is_provided(mocker: MockerFixture):
     """Should return a ValidationException if an invalid email is provided"""
     test = make_sut()
     sut = test.get('sut')
     email_validator_stub = test.get('email_validator_stub')
-    
+
     mocker.patch.object(email_validator_stub, 'is_valid', return_value=False, autospec=True)
 
     message = Message({
