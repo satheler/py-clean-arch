@@ -188,3 +188,21 @@ def test_call_add_account_with_correct_values(mocker: MockerFixture) -> None:
         email=message.body.get('email'),
         password=message.body.get('password')
     )
+
+def test_raise_when_add_account_raises(mocker: MockerFixture) -> None:
+    """Should raise if AddAccount raises"""
+    test = make_sut()
+    sut = test.get('sut')
+    add_account_stub = test.get('add_account_stub')
+
+    add_account_spy = mocker.spy(add_account_stub, 'add')
+    add_account_spy.side_effect = Exception('Unexpected error')
+
+    message = Message({
+        'email': 'any_email@mail.com',
+        'password': 'any_password',
+        'password_confirmation': 'any_password'
+    })
+
+    with pytest.raises(BaseException):
+        sut.handle(message)
