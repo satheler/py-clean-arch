@@ -9,7 +9,7 @@ class SignUpController(Controller):
         self.email_validator = email_validator
 
     def handle(self, message: Message):
-        required_fields = ['name', 'email', 'password', 'password_confirmation']
+        required_fields = ['email', 'password', 'password_confirmation']
 
         for field in required_fields: 
             if not message.body.get(field):
