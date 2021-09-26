@@ -21,14 +21,16 @@ def make_email_validator_stub() -> EmailValidator:
     return EmailValidatorStub()
 
 
+fake_account = {
+    'id': 'valid_id',
+    'email': 'valid_email@mail.com',
+    'password': 'valid_password'
+}
+
+
 def make_add_account_stub() -> AddAccount:
     class AddAccountStub(AddAccount):
         def add(self, email: str, password: str) -> Account:
-            fake_account = {
-                'id': 'valid_id',
-                'email': 'valid_email@mail.com',
-                'password': 'valid_password'
-            }
             return fake_account
 
     return AddAccountStub()
@@ -225,8 +227,4 @@ def test_when_account_is_created(mocker: MockerFixture) -> None:
 
     result = sut.handle(message)
 
-    assert {
-        'id': 'valid_id',
-        'email': 'valid_email@mail.com',
-        'password': 'valid_password'
-    } == result
+    assert fake_account == result
