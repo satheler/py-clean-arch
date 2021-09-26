@@ -3,5 +3,5 @@ class Controller:
     raise NotImplementedError()
 
 class EmailValidator:
-  def is_valid(self, email: str):
+  def is_valid(self, email: str) -> bool:
     raise NotImplementedError()
