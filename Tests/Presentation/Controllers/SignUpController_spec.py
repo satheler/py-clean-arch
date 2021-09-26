@@ -33,6 +33,7 @@ def make_add_account_stub() -> AddAccount:
 
     return AddAccountStub()
 
+
 def make_sut() -> Dict[str, object]:
     email_validator_stub = make_email_validator_stub()
     add_account_stub = make_add_account_stub()
@@ -43,6 +44,7 @@ def make_sut() -> Dict[str, object]:
         'email_validator_stub': email_validator_stub,
         'add_account_stub': add_account_stub
     }
+
 
 def test_when_no_email_is_provided() -> None:
     """Should return a ValidationException if no email is provided """
@@ -168,6 +170,7 @@ def test_raise_when_email_validator_raises(mocker: MockerFixture) -> None:
     with pytest.raises(BaseException):
         sut.handle(message)
 
+
 def test_call_add_account_with_correct_values(mocker: MockerFixture) -> None:
     """Should call AddAccount with correct values"""
     test = make_sut()
@@ -189,6 +192,7 @@ def test_call_add_account_with_correct_values(mocker: MockerFixture) -> None:
         password=message.body.get('password')
     )
 
+
 def test_raise_when_add_account_raises(mocker: MockerFixture) -> None:
     """Should raise if AddAccount raises"""
     test = make_sut()
@@ -206,3 +210,23 @@ def test_raise_when_add_account_raises(mocker: MockerFixture) -> None:
 
     with pytest.raises(BaseException):
         sut.handle(message)
+
+
+def test_when_account_is_created(mocker: MockerFixture) -> None:
+    """Should return an Account if correct values are provided"""
+    test = make_sut()
+    sut = test.get('sut')
+
+    message = Message({
+        'email': 'valid_email@mail.com',
+        'password': 'valid_password',
+        'password_confirmation': 'valid_password'
+    })
+
+    result = sut.handle(message)
+
+    assert {
+        'id': 'valid_id',
+        'email': 'valid_email@mail.com',
+        'password': 'valid_password'
+    } == result
