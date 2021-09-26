@@ -23,4 +23,5 @@ class SignUpController(Controller):
         if not valid_email:
             raise ValidationError({'email': ['is invalid']})
 
-        self.add_account.add(message.body.get('email'), message.body.get('password'))
+        account = self.add_account.add(message.body.get('email'), message.body.get('password'))
+        return account
