@@ -8,12 +8,15 @@ from Core.Message import Message
 from Presentation.Controllers.SignUpController import SignUpController
 from Presentation.Errors.ValidationError import ValidationError
 
-def make_sut() -> Dict[str, object]:
+def make_email_validator_stub():
     class EmailValidatorStub(EmailValidator):
         def is_valid(self, email: str) -> bool:
             return True
 
-    email_validator_stub = EmailValidatorStub()
+    return EmailValidatorStub()
+
+def make_sut() -> Dict[str, object]:
+    email_validator_stub = make_email_validator_stub()
     sut = SignUpController(email_validator_stub)
 
     return {
@@ -39,7 +42,7 @@ def test_when_no_name_is_provided():
     assert {'name': 'is required'} in result.value.errors
 
 
-def test_when_no_email_is_provided():
+def test_when_no_email_is_provided() -> None:
     """Should return a ValidationException if no email is provided """
     test = make_sut()
     sut = test.get('sut')
@@ -136,7 +139,7 @@ def test_raise_when_email_validator_raises(mocker: MockerFixture):
     email_validator_stub = test.get('email_validator_stub')
     
     email_validator_spy = mocker.spy(email_validator_stub, 'is_valid')
-    email_validator_spy.side_effect = BaseException('Unexpected error')
+    email_validator_spy.side_effect = Exception('Unexpected error')
 
     message = Message({
         'name': 'any_name',
@@ -147,5 +150,3 @@ def test_raise_when_email_validator_raises(mocker: MockerFixture):
 
     with pytest.raises(BaseException):
         sut.handle(message)
-
-    # assert {'email': 'is invalid'} in result.value.errors
