@@ -2,11 +2,12 @@ from typing import Dict
 import pytest
 from pytest_mock import MockerFixture
 
-from Contracts.EmailValidator import EmailValidator
+from Contracts import EmailValidator
 
 from Core.Message import Message
 from Presentation.Controllers.SignUpController import SignUpController
 from Presentation.Errors.ValidationError import ValidationError
+
 
 def make_email_validator_stub():
     class EmailValidatorStub(EmailValidator):

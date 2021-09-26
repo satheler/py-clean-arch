@@ -1,5 +1,4 @@
-from Contracts.Controller import Controller
-from Contracts.EmailValidator import EmailValidator
+from Contracts import Controller, EmailValidator
 from Core.Message import Message
 from Presentation.Errors.ValidationError import ValidationError
 
