@@ -1,7 +1,11 @@
-class Controller:
-  def handle(self, message):
-    raise NotImplementedError()
+from abc import ABCMeta, abstractmethod
 
-class EmailValidator:
+class Controller(metaclass=ABCMeta):
+  @abstractmethod
+  def handle(self, message):
+    pass
+
+class EmailValidator(metaclass=ABCMeta):
+  @abstractmethod
   def is_valid(self, email: str) -> bool:
-    raise NotImplementedError()
+    pass

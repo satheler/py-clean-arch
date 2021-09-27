@@ -23,6 +23,7 @@ def test_when_valid_email_is_provided(mocker: MockerFixture):
     is_valid = sut.is_valid('valid_email@mail.com')
     assert is_valid == True
 
+
 def test_call_regex_match(mocker: MockerFixture):
     """Should return true if email is valid"""
     sut = make_sut()
