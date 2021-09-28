@@ -2,7 +2,7 @@ from Data.Contracts.StoreAccountRepository import StoreAccountRepository
 from Data.Contracts.Encrypter import Encrypter
 
 
-class DatabaseAddAccount:
+class StoreAccount:
     def __init__(
         self,
         encrypter: Encrypter,
@@ -11,7 +11,7 @@ class DatabaseAddAccount:
         self.store_account_repository = store_account_repository
         self.encrypter = encrypter
 
-    def add(self, email: str, password: str):
+    def store(self, email: str, password: str):
         hashed_password = self.encrypter.encrypt(password)
         self.store_account_repository.store(
             email=email,

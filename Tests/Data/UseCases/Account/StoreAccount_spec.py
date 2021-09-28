@@ -3,7 +3,7 @@ from pytest_mock import MockerFixture
 
 from Data.Contracts.Encrypter import Encrypter
 from Data.Contracts.StoreAccountRepository import StoreAccountRepository
-from Data.UseCases.Account.DatabaseAddAccount import DatabaseAddAccount
+from Data.UseCases.Account.StoreAccount import StoreAccount
 from Domain.Entities.Account import Account
 
 
@@ -30,7 +30,7 @@ def make_store_account_repository_stub():
 def make_sut():
     encrypter_stub = make_encrypter_stub()
     store_account_repository_stub = make_store_account_repository_stub()
-    sut = DatabaseAddAccount(encrypter_stub, store_account_repository_stub)
+    sut = StoreAccount(encrypter_stub, store_account_repository_stub)
 
     return {
         'sut': sut,
@@ -52,7 +52,7 @@ def test_call_encrypter_with_correct_values(mocker: MockerFixture):
         'password': 'valid_password'
     }
 
-    sut.add(
+    sut.store(
         email=account_data.get('email'),
         password=account_data.get('password')
     )
@@ -75,7 +75,7 @@ def test_raise_when_encrypter_raises(mocker: MockerFixture) -> None:
     }
 
     with pytest.raises(BaseException):
-        sut.add(
+        sut.store(
             email=account_data.get('email'),
             password=account_data.get('password')
         )
@@ -93,7 +93,7 @@ def test_call_store_account_repository_with_correct_values(mocker: MockerFixture
         'password': 'valid_password'
     }
 
-    sut.add(
+    sut.store(
         email=account_data.get('email'),
         password=account_data.get('password')
     )
