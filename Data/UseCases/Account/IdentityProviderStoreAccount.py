@@ -14,9 +14,9 @@ class IdentityProviderStoreAccount(StoreAccount):
 
     def store(self, email: str, password: str):
         hashed_password = self.encrypter.encrypt(password)
-        self.store_account_repository.store(
+        account = self.store_account_repository.store(
             email=email,
             password=hashed_password
         )
         
-         
+        return account
