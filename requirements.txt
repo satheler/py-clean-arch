@@ -2,7 +2,9 @@
 # USE: pip install -r requirements.txt
 
 autopep8==1.5.7
+boto3==1.18.50
 coverage==5.5
+moto==2.2.8
 pylint==2.11.1
 pep8==1.7.1
 pytest==6.2.5
