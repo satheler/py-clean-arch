@@ -1,8 +1,9 @@
+from Domain.UseCases.Account import StoreAccount
 from Data.Contracts.StoreAccountRepository import StoreAccountRepository
 from Data.Contracts.Encrypter import Encrypter
 
 
-class StoreAccount:
+class IdentityProviderStoreAccount(StoreAccount):
     def __init__(
         self,
         encrypter: Encrypter,

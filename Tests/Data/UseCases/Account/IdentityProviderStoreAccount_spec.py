@@ -3,7 +3,7 @@ from pytest_mock import MockerFixture
 
 from Data.Contracts.Encrypter import Encrypter
 from Data.Contracts.StoreAccountRepository import StoreAccountRepository
-from Data.UseCases.Account.StoreAccount import StoreAccount
+from Data.UseCases.Account.IdentityProviderStoreAccount import IdentityProviderStoreAccount
 from Domain.Entities.Account import Account
 
 
@@ -30,7 +30,7 @@ def make_store_account_repository_stub():
 def make_sut():
     encrypter_stub = make_encrypter_stub()
     store_account_repository_stub = make_store_account_repository_stub()
-    sut = StoreAccount(encrypter_stub, store_account_repository_stub)
+    sut = IdentityProviderStoreAccount(encrypter_stub, store_account_repository_stub)
 
     return {
         'sut': sut,

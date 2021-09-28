@@ -1,13 +1,13 @@
-from Domain.UseCases.Account import AddAccount
+from Domain.UseCases.Account import StoreAccount
 from Contracts import Controller, EmailValidator
 from Core.Message import Message
 from Presentation.Errors.ValidationError import ValidationError
 
 
 class SignUpController(Controller):
-    def __init__(self, email_validator: EmailValidator, add_account: AddAccount):
+    def __init__(self, email_validator: EmailValidator, store_account: StoreAccount):
         self.email_validator = email_validator
-        self.add_account = add_account
+        self.store_account = store_account
 
     def handle(self, message: Message):
         required_fields = ['email', 'password', 'password_confirmation']
@@ -23,5 +23,5 @@ class SignUpController(Controller):
         if not valid_email:
             raise ValidationError({'email': ['is invalid']})
 
-        account = self.add_account.add(message.body.get('email'), message.body.get('password'))
+        account = self.store_account.store(message.body.get('email'), message.body.get('password'))
         return account

@@ -7,7 +7,7 @@ from Contracts import EmailValidator
 from Core.Message import Message
 
 from Domain.Entities.Account import Account
-from Domain.UseCases.Account import AddAccount
+from Domain.UseCases.Account import StoreAccount
 
 from Presentation.Controllers.SignUpController import SignUpController
 from Presentation.Errors.ValidationError import ValidationError
@@ -28,23 +28,23 @@ fake_account = {
 }
 
 
-def make_add_account_stub() -> AddAccount:
-    class AddAccountStub(AddAccount):
-        def add(self, email: str, password: str) -> Account:
+def make_store_account_stub() -> StoreAccount:
+    class StoreAccountStub(StoreAccount):
+        def store(self, email: str, password: str) -> Account:
             return fake_account
 
-    return AddAccountStub()
+    return StoreAccountStub()
 
 
 def make_sut() -> Dict[str, object]:
     email_validator_stub = make_email_validator_stub()
-    add_account_stub = make_add_account_stub()
-    sut = SignUpController(email_validator_stub, add_account_stub)
+    store_account_stub = make_store_account_stub()
+    sut = SignUpController(email_validator_stub, store_account_stub)
 
     return {
         'sut': sut,
         'email_validator_stub': email_validator_stub,
-        'add_account_stub': add_account_stub
+        'store_account_stub': store_account_stub
     }
 
 
@@ -173,13 +173,13 @@ def test_raise_when_email_validator_raises(mocker: MockerFixture) -> None:
         sut.handle(message)
 
 
-def test_call_add_account_with_correct_values(mocker: MockerFixture) -> None:
-    """Should call AddAccount with correct values"""
+def test_call_store_account_with_correct_values(mocker: MockerFixture) -> None:
+    """Should call StoreAccount with correct values"""
     test = make_sut()
     sut = test.get('sut')
-    add_account_stub = test.get('add_account_stub')
+    store_account_stub = test.get('store_account_stub')
 
-    add_account_spy = mocker.spy(add_account_stub, 'add')
+    store_account_spy = mocker.spy(store_account_stub, 'store')
 
     message = Message({
         'email': 'any_email@mail.com',
@@ -189,20 +189,20 @@ def test_call_add_account_with_correct_values(mocker: MockerFixture) -> None:
 
     sut.handle(message)
 
-    add_account_spy.assert_called_once_with(
+    store_account_spy.assert_called_once_with(
         email=message.body.get('email'),
         password=message.body.get('password')
     )
 
 
-def test_raise_when_add_account_raises(mocker: MockerFixture) -> None:
-    """Should raise if AddAccount raises"""
+def test_raise_when_store_account_raises(mocker: MockerFixture) -> None:
+    """Should raise if StoreAccount raises"""
     test = make_sut()
     sut = test.get('sut')
-    add_account_stub = test.get('add_account_stub')
+    store_account_stub = test.get('store_account_stub')
 
-    add_account_spy = mocker.spy(add_account_stub, 'add')
-    add_account_spy.side_effect = Exception('Unexpected error')
+    store_account_spy = mocker.spy(store_account_stub, 'store')
+    store_account_spy.side_effect = Exception('Unexpected error')
 
     message = Message({
         'email': 'any_email@mail.com',
