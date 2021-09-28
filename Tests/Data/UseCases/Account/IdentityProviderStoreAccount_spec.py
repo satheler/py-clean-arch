@@ -102,3 +102,23 @@ def test_call_store_account_repository_with_correct_values(mocker: MockerFixture
         email=account_data.get('email'),
         password='hashed_password',
     )
+
+def test_raise_when_store_account_repository_raises(mocker: MockerFixture) -> None:
+    """Should raise if StoreAccountRepository raises"""
+    test = make_sut()
+    sut = test.get('sut')
+    store_account_repository_stub = test.get('store_account_repository_stub')
+
+    store_account_repository_spy = mocker.spy(store_account_repository_stub, 'store')
+    store_account_repository_spy.side_effect = Exception('Unexpected error')
+
+    account_data = {
+        'email': 'valid@mail.com',
+        'password': 'valid_password'
+    }
+
+    with pytest.raises(BaseException):
+        sut.store(
+            email=account_data.get('email'),
+            password=account_data.get('password')
+        )
