@@ -3,16 +3,29 @@ from pytest_mock import MockerFixture
 from Data.Contracts.Encrypter import Encrypter
 from Data.UseCases.Account.DatabaseAddAccount import DatabaseAddAccount
 
-
-def test_call_encrypter_with_correct_values(mocker: MockerFixture):
-  """Should call Encrypter with correct password"""
+def make_encrypter_stub():
   class EncrypterStub(Encrypter):
     def encrypt(self, value: str) -> str:
       return 'hashed_password'
 
-  encrypter_stub = EncrypterStub()
+  return EncrypterStub()
 
+
+def make_sut():
+  encrypter_stub = make_encrypter_stub()
   sut = DatabaseAddAccount(encrypter_stub)
+
+  return {
+    'sut': sut,
+    'encrypter_stub': encrypter_stub
+  }
+
+def test_call_encrypter_with_correct_values(mocker: MockerFixture):
+  """Should call Encrypter with correct password"""
+  test = make_sut()
+  sut = test.get('sut')
+  encrypter_stub = test.get('encrypter_stub')
+
   encrypter_spy = mocker.spy(encrypter_stub, 'encrypt')
 
   account_data = {
