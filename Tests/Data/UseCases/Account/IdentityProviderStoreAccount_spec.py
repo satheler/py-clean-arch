@@ -122,3 +122,27 @@ def test_raise_when_store_account_repository_raises(mocker: MockerFixture) -> No
             email=account_data.get('email'),
             password=account_data.get('password')
         )
+
+
+def test_on_success():
+    """Should return an Account on success"""
+    test = make_sut()
+    sut = test.get('sut')
+
+    account_data = {
+        'email': 'valid@mail.com',
+        'password': 'valid_password'
+    }
+
+    account = sut.store(
+        email=account_data.get('email'),
+        password=account_data.get('password')
+    )
+
+    expected_account = Account()
+    expected_account.id = 'valid_id'
+    expected_account.email = 'valid@mail.com'
+    expected_account.password = 'hashed_password'
+
+    assert account == expected_account
+
