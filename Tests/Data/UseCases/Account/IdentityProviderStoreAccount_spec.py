@@ -139,10 +139,7 @@ def test_on_success():
         password=account_data.get('password')
     )
 
-    expected_account = Account()
-    expected_account.id = 'valid_id'
-    expected_account.email = 'valid@mail.com'
-    expected_account.password = 'hashed_password'
-
-    assert account == expected_account
-
+    assert isinstance(account, Account)
+    assert account.id == 'valid_id'
+    assert account.email == 'valid@mail.com'
+    assert account.password == 'hashed_password'
