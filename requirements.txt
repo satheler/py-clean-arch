@@ -10,3 +10,4 @@ pep8==1.7.1
 pytest==6.2.5
 pytest_mock==3.6.1
 pytest-watch==4.2.0
+python_jose==3.3.0
