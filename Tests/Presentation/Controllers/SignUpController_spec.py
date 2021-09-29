@@ -13,14 +13,6 @@ from Presentation.Controllers.SignUpController import SignUpController
 from Presentation.Errors.ValidationError import ValidationError
 
 
-def make_email_validator_stub() -> EmailValidator:
-    class EmailValidatorStub(EmailValidator):
-        def is_valid(self, email: str) -> bool:
-            return True
-
-    return EmailValidatorStub()
-
-
 fake_account = {
     'id': 'valid_id',
     'email': 'valid_email@mail.com',
@@ -28,7 +20,17 @@ fake_account = {
 }
 
 
-def make_store_account_stub() -> StoreAccount:
+@pytest.fixture
+def email_validator_stub() -> EmailValidator:
+    class EmailValidatorStub(EmailValidator):
+        def is_valid(self, email: str) -> bool:
+            return True
+
+    return EmailValidatorStub()
+
+
+@pytest.fixture
+def store_account_stub() -> StoreAccount:
     class StoreAccountStub(StoreAccount):
         def store(self, email: str, password: str) -> Account:
             return fake_account
@@ -36,23 +38,13 @@ def make_store_account_stub() -> StoreAccount:
     return StoreAccountStub()
 
 
-def make_sut() -> Dict[str, object]:
-    email_validator_stub = make_email_validator_stub()
-    store_account_stub = make_store_account_stub()
-    sut = SignUpController(email_validator_stub, store_account_stub)
-
-    return {
-        'sut': sut,
-        'email_validator_stub': email_validator_stub,
-        'store_account_stub': store_account_stub
-    }
+@pytest.fixture
+def sut(email_validator_stub: EmailValidator, store_account_stub: StoreAccount) -> SignUpController:
+    return SignUpController(email_validator_stub, store_account_stub)
 
 
-def test_when_no_email_is_provided() -> None:
+def test_when_no_email_is_provided(sut: SignUpController) -> None:
     """Should return a ValidationException if no email is provided """
-    test = make_sut()
-    sut = test.get('sut')
-
     message = Message({
         'password': 'any_password',
         'password_confirmation': 'any_password'
@@ -64,11 +56,8 @@ def test_when_no_email_is_provided() -> None:
     assert {'email': 'is required'} in result.value.errors
 
 
-def test_when_no_password_is_provided() -> None:
+def test_when_no_password_is_provided(sut: SignUpController) -> None:
     """Should return a ValidationException if no password is provided """
-    test = make_sut()
-    sut = test.get('sut')
-
     message = Message({
         'email': 'any_email@mail.com',
         'password_confirmation': 'any_password'
@@ -80,11 +69,8 @@ def test_when_no_password_is_provided() -> None:
     assert {'password': 'is required'} in result.value.errors
 
 
-def test_when_no_password_confirmation_is_provided() -> None:
+def test_when_no_password_confirmation_is_provided(sut: SignUpController) -> None:
     """Should return a ValidationException if no password_confirmation is provided """
-    test = make_sut()
-    sut = test.get('sut')
-
     message = Message({
         'email': 'any_email@mail.com',
         'password': 'any_password'
@@ -96,11 +82,8 @@ def test_when_no_password_confirmation_is_provided() -> None:
     assert {'password_confirmation': 'is required'} in result.value.errors
 
 
-def test_when_password_confirmation_fails() -> None:
+def test_when_password_confirmation_fails(sut: SignUpController) -> None:
     """Should return a ValidationException if password_confirmation is different from password"""
-    test = make_sut()
-    sut = test.get('sut')
-
     message = Message({
         'email': 'any_email@mail.com',
         'password': 'any_password',
@@ -114,12 +97,12 @@ def test_when_password_confirmation_fails() -> None:
         'password_confirmation': 'does not match with password'} in result.value.errors
 
 
-def test_when_invalid_email_is_provided(mocker: MockerFixture) -> None:
+def test_when_invalid_email_is_provided(
+    sut: SignUpController,
+    email_validator_stub: EmailValidator,
+    mocker: MockerFixture
+) -> None:
     """Should return a ValidationException if an invalid email is provided"""
-    test = make_sut()
-    sut = test.get('sut')
-    email_validator_stub = test.get('email_validator_stub')
-
     mocker.patch.object(email_validator_stub, 'is_valid',
                         return_value=False, autospec=True)
 
@@ -135,12 +118,12 @@ def test_when_invalid_email_is_provided(mocker: MockerFixture) -> None:
     assert {'email': 'is invalid'} in result.value.errors
 
 
-def test_call_email_validator_with_correct_values(mocker: MockerFixture) -> None:
+def test_call_email_validator_with_correct_values(
+    sut: SignUpController,
+    email_validator_stub: EmailValidator,
+    mocker: MockerFixture
+) -> None:
     """Should call EmailValidator with correct email"""
-    test = make_sut()
-    sut = test.get('sut')
-    email_validator_stub = test.get('email_validator_stub')
-
     email_validator_spy = mocker.spy(email_validator_stub, 'is_valid')
 
     message = Message({
@@ -154,12 +137,12 @@ def test_call_email_validator_with_correct_values(mocker: MockerFixture) -> None
     email_validator_spy.assert_called_once_with(message.body.get('email'))
 
 
-def test_raise_when_email_validator_raises(mocker: MockerFixture) -> None:
+def test_raise_when_email_validator_raises(
+    sut: SignUpController,
+    email_validator_stub: EmailValidator,
+    mocker: MockerFixture
+) -> None:
     """Should raise if EmailValidator raises"""
-    test = make_sut()
-    sut = test.get('sut')
-    email_validator_stub = test.get('email_validator_stub')
-
     email_validator_spy = mocker.spy(email_validator_stub, 'is_valid')
     email_validator_spy.side_effect = Exception('Unexpected error')
 
@@ -173,12 +156,12 @@ def test_raise_when_email_validator_raises(mocker: MockerFixture) -> None:
         sut.handle(message)
 
 
-def test_call_store_account_with_correct_values(mocker: MockerFixture) -> None:
+def test_call_store_account_with_correct_values(
+    sut: SignUpController,
+    store_account_stub: StoreAccount,
+    mocker: MockerFixture
+) -> None:
     """Should call StoreAccount with correct values"""
-    test = make_sut()
-    sut = test.get('sut')
-    store_account_stub = test.get('store_account_stub')
-
     store_account_spy = mocker.spy(store_account_stub, 'store')
 
     message = Message({
@@ -195,12 +178,12 @@ def test_call_store_account_with_correct_values(mocker: MockerFixture) -> None:
     )
 
 
-def test_raise_when_store_account_raises(mocker: MockerFixture) -> None:
+def test_raise_when_store_account_raises(
+    sut: SignUpController,
+    store_account_stub: StoreAccount,
+    mocker: MockerFixture
+) -> None:
     """Should raise if StoreAccount raises"""
-    test = make_sut()
-    sut = test.get('sut')
-    store_account_stub = test.get('store_account_stub')
-
     store_account_spy = mocker.spy(store_account_stub, 'store')
     store_account_spy.side_effect = Exception('Unexpected error')
 
@@ -214,11 +197,8 @@ def test_raise_when_store_account_raises(mocker: MockerFixture) -> None:
         sut.handle(message)
 
 
-def test_when_account_is_created(mocker: MockerFixture) -> None:
+def test_on_success(sut: SignUpController) -> None:
     """Should return an Account if correct values are provided"""
-    test = make_sut()
-    sut = test.get('sut')
-
     message = Message({
         'email': 'valid_email@mail.com',
         'password': 'valid_password',

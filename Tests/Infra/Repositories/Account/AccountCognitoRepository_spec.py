@@ -1,12 +1,14 @@
+import pytest
+
 from Infra.Repositories.Account.AccountCognitoRepository import AccountCognitoRepository
 from Domain.Entities.Account import Account
 
-def make_sut():
+@pytest.fixture
+def sut() -> AccountCognitoRepository:
     return AccountCognitoRepository()
 
-def test_on_success(cognito_idp):
+def test_on_success(sut: AccountCognitoRepository, cognito_idp):
     """Should return an Account on success"""
-    sut = make_sut()
     email = 'valid@mail.com'
     password = 'hashed_password'
 

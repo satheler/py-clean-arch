@@ -7,7 +7,8 @@ from Data.UseCases.Account.IdentityProviderStoreAccount import IdentityProviderS
 from Domain.Entities.Account import Account
 
 
-def make_encrypter_stub():
+@pytest.fixture
+def encrypter_stub() -> Encrypter:
     class EncrypterStub(Encrypter):
         def encrypt(self, value: str) -> str:
             return 'hashed_password'
@@ -15,36 +16,34 @@ def make_encrypter_stub():
     return EncrypterStub()
 
 
-def make_store_account_repository_stub():
-  class StoreAccountRepositoryStub(StoreAccountRepository):
-    def store(self, email: str, password: str) -> Account:
-      account = Account()
-      account.id = 'valid_id'
-      account.email = 'valid@mail.com'
-      account.password = 'hashed_password'
+@pytest.fixture
+def store_account_repository_stub() -> StoreAccountRepository:
+    class StoreAccountRepositoryStub(StoreAccountRepository):
+        def store(self, email: str, password: str) -> Account:
+            account = Account()
+            account.id = 'valid_id'
+            account.email = 'valid@mail.com'
+            account.password = 'hashed_password'
 
-      return account
+            return account
 
-  return StoreAccountRepositoryStub()
-
-def make_sut():
-    encrypter_stub = make_encrypter_stub()
-    store_account_repository_stub = make_store_account_repository_stub()
-    sut = IdentityProviderStoreAccount(encrypter_stub, store_account_repository_stub)
-
-    return {
-        'sut': sut,
-        'encrypter_stub': encrypter_stub,
-        'store_account_repository_stub': store_account_repository_stub
-    }
+    return StoreAccountRepositoryStub()
 
 
-def test_call_encrypter_with_correct_values(mocker: MockerFixture):
+@pytest.fixture
+def sut(
+    encrypter_stub: Encrypter,
+    store_account_repository_stub: StoreAccountRepository
+) -> IdentityProviderStoreAccount:
+    return IdentityProviderStoreAccount(encrypter_stub, store_account_repository_stub)
+
+
+def test_call_encrypter_with_correct_values(
+    sut: IdentityProviderStoreAccount,
+    encrypter_stub: Encrypter,
+    mocker: MockerFixture
+):
     """Should call Encrypter with correct password"""
-    test = make_sut()
-    sut = test.get('sut')
-    encrypter_stub = test.get('encrypter_stub')
-
     encrypter_spy = mocker.spy(encrypter_stub, 'encrypt')
 
     account_data = {
@@ -60,12 +59,12 @@ def test_call_encrypter_with_correct_values(mocker: MockerFixture):
     encrypter_spy.assert_called_once_with('valid_password')
 
 
-def test_raise_when_encrypter_raises(mocker: MockerFixture) -> None:
+def test_raise_when_encrypter_raises(
+        sut: IdentityProviderStoreAccount,
+        encrypter_stub: Encrypter,
+        mocker: MockerFixture
+) -> None:
     """Should raise if Encrypter raises"""
-    test = make_sut()
-    sut = test.get('sut')
-    encrypter_stub = test.get('encrypter_stub')
-
     encrypter_spy = mocker.spy(encrypter_stub, 'encrypt')
     encrypter_spy.side_effect = Exception('Unexpected error')
 
@@ -80,13 +79,15 @@ def test_raise_when_encrypter_raises(mocker: MockerFixture) -> None:
             password=account_data.get('password')
         )
 
-def test_call_store_account_repository_with_correct_values(mocker: MockerFixture):
-    """Should call StoreAccountRepository with correct values"""
-    test = make_sut()
-    sut = test.get('sut')
-    store_account_repository_stub = test.get('store_account_repository_stub')
 
-    store_account_repository_spy = mocker.spy(store_account_repository_stub, 'store')
+def test_call_store_account_repository_with_correct_values(
+    sut: IdentityProviderStoreAccount,
+    store_account_repository_stub: StoreAccountRepository,
+    mocker: MockerFixture
+):
+    """Should call StoreAccountRepository with correct values"""
+    store_account_repository_spy = mocker.spy(
+        store_account_repository_stub, 'store')
 
     account_data = {
         'email': 'valid@mail.com',
@@ -103,13 +104,15 @@ def test_call_store_account_repository_with_correct_values(mocker: MockerFixture
         password='hashed_password',
     )
 
-def test_raise_when_store_account_repository_raises(mocker: MockerFixture) -> None:
-    """Should raise if StoreAccountRepository raises"""
-    test = make_sut()
-    sut = test.get('sut')
-    store_account_repository_stub = test.get('store_account_repository_stub')
 
-    store_account_repository_spy = mocker.spy(store_account_repository_stub, 'store')
+def test_raise_when_store_account_repository_raises(
+    sut: IdentityProviderStoreAccount,
+    store_account_repository_stub: StoreAccountRepository,
+    mocker: MockerFixture
+) -> None:
+    """Should raise if StoreAccountRepository raises"""
+    store_account_repository_spy = mocker.spy(
+        store_account_repository_stub, 'store')
     store_account_repository_spy.side_effect = Exception('Unexpected error')
 
     account_data = {
@@ -124,11 +127,8 @@ def test_raise_when_store_account_repository_raises(mocker: MockerFixture) -> No
         )
 
 
-def test_on_success():
+def test_on_success(sut: IdentityProviderStoreAccount):
     """Should return an Account on success"""
-    test = make_sut()
-    sut = test.get('sut')
-
     account_data = {
         'email': 'valid@mail.com',
         'password': 'valid_password'
