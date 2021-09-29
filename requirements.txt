@@ -4,10 +4,12 @@
 autopep8==1.5.7
 boto3==1.18.50
 coverage==5.5
+flask==2.0.1
 moto==2.2.8
-pylint==2.11.1
 pep8==1.7.1
+pylint==2.11.1
 pytest==6.2.5
 pytest_mock==3.6.1
 pytest-watch==4.2.0
+python_dotenv==0.19.0
 python_jose==3.3.0
