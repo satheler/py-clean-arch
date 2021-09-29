@@ -1,11 +1,12 @@
 from Infra.Repositories.Account.AccountCognitoRepository import AccountCognitoRepository
 from Domain.Entities.Account import Account
 
+def make_sut():
+    return AccountCognitoRepository()
 
 def test_on_success(cognito_idp):
     """Should return an Account on success"""
-    sut = AccountCognitoRepository()
-
+    sut = make_sut()
     email = 'valid@mail.com'
     password = 'hashed_password'
 
