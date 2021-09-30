@@ -1,19 +1,9 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from Data.Contracts.Encrypter import Encrypter
 from Data.Contracts.StoreAccountRepository import StoreAccountRepository
 from Data.UseCases.Account.IdentityProviderStoreAccount import IdentityProviderStoreAccount
 from Domain.Entities.Account import Account
-
-
-@pytest.fixture
-def encrypter_stub() -> Encrypter:
-    class EncrypterStub(Encrypter):
-        def encrypt(self, value: str) -> str:
-            return 'hashed_password'
-
-    return EncrypterStub()
 
 
 @pytest.fixture
@@ -23,7 +13,7 @@ def store_account_repository_stub() -> StoreAccountRepository:
             account = Account()
             account.id = 'valid_id'
             account.email = 'valid@mail.com'
-            account.password = 'hashed_password'
+            account.password = 'valid_password'
 
             return account
 
@@ -31,53 +21,8 @@ def store_account_repository_stub() -> StoreAccountRepository:
 
 
 @pytest.fixture
-def sut(
-    encrypter_stub: Encrypter,
-    store_account_repository_stub: StoreAccountRepository
-) -> IdentityProviderStoreAccount:
-    return IdentityProviderStoreAccount(encrypter_stub, store_account_repository_stub)
-
-
-def test_call_encrypter_with_correct_values(
-    sut: IdentityProviderStoreAccount,
-    encrypter_stub: Encrypter,
-    mocker: MockerFixture
-):
-    """Should call Encrypter with correct password"""
-    encrypter_spy = mocker.spy(encrypter_stub, 'encrypt')
-
-    account_data = {
-        'email': 'valid@mail.com',
-        'password': 'valid_password'
-    }
-
-    sut.store(
-        email=account_data.get('email'),
-        password=account_data.get('password')
-    )
-
-    encrypter_spy.assert_called_once_with('valid_password')
-
-
-def test_raise_when_encrypter_raises(
-        sut: IdentityProviderStoreAccount,
-        encrypter_stub: Encrypter,
-        mocker: MockerFixture
-) -> None:
-    """Should raise if Encrypter raises"""
-    encrypter_spy = mocker.spy(encrypter_stub, 'encrypt')
-    encrypter_spy.side_effect = Exception('Unexpected error')
-
-    account_data = {
-        'email': 'valid@mail.com',
-        'password': 'valid_password'
-    }
-
-    with pytest.raises(BaseException):
-        sut.store(
-            email=account_data.get('email'),
-            password=account_data.get('password')
-        )
+def sut(store_account_repository_stub: StoreAccountRepository) -> IdentityProviderStoreAccount:
+    return IdentityProviderStoreAccount(store_account_repository_stub)
 
 
 def test_call_store_account_repository_with_correct_values(
@@ -101,7 +46,7 @@ def test_call_store_account_repository_with_correct_values(
 
     store_account_repository_spy.assert_called_once_with(
         email=account_data.get('email'),
-        password='hashed_password',
+        password='valid_password',
     )
 
 
@@ -142,4 +87,4 @@ def test_on_success(sut: IdentityProviderStoreAccount):
     assert isinstance(account, Account)
     assert account.id == 'valid_id'
     assert account.email == 'valid@mail.com'
-    assert account.password == 'hashed_password'
+    assert account.password == 'valid_password'
