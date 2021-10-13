@@ -4,7 +4,7 @@ from Presentation.Controllers.SignUpController import SignUpController
 from Utils.EmailValidatorAdapter import EmailValidatorAdapter
 
 
-def make_sign_up_controller():
+def make_sign_up_controller() -> SignUpController:
     email_validator_adapter = EmailValidatorAdapter()
     store_account_repository = AccountCognitoRepository()
     identity_provider_store_account = IdentityProviderStoreAccount(

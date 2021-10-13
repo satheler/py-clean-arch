@@ -4,8 +4,8 @@ from os import environ
 class Message(object):
     """Message class."""
 
-    def __init__(self, body = {}):
+    def __init__(self, content={}):
         """Initialize Message."""
-        self.body = body
+        self.content = content
         self.env = environ
         self.context = {}

@@ -17,14 +17,15 @@ def aws_credentials():
 @pytest.fixture(scope='function')
 def cognito_idp(aws_credentials):
     with mock_cognitoidp():
-        client = boto3.client('cognito-idp', region_name='us-east-1')
-        
+        client = boto3.client('cognito-idp')
+
         user_pool = create_user_pool(client)
         user_pool_id = user_pool.get('Id')
 
         user_pool_client = create_user_pool_client(client, user_pool_id)
-        environ['COGNITO_USER_POOL_CLIENT_ID'] = user_pool_client.get('ClientId')
-        
+        environ['COGNITO_USER_POOL_CLIENT_ID'] = user_pool_client.get(
+            'ClientId')
+
         yield client
 
 
@@ -113,28 +114,28 @@ def create_user_pool(client, pool_name: str = 'testing'):
 
     return user_pool.get('UserPool')
 
+
 def create_user_pool_client(client, user_pool_id: str):
-  user_pool_client = client.create_user_pool_client(
-    UserPoolId=user_pool_id,
-    AccessTokenValidity=60,
-    RefreshTokenValidity=30,
-    AllowedOAuthFlowsUserPoolClient=False,
-    ClientName='testing',
-    ExplicitAuthFlows=[
-      'ALLOW_CUSTOM_AUTH',
-      'ALLOW_REFRESH_TOKEN_AUTH',
-      'ALLOW_USER_PASSWORD_AUTH',
-      'ALLOW_USER_SRP_AUTH'
-    ],
-    IdTokenValidity=60,
-    GenerateSecret=False,
-    PreventUserExistenceErrors='ENABLED',
-    TokenValidityUnits={
-      'AccessToken': 'minutes',
-      'IdToken': 'minutes',
-      'RefreshToken': 'days'
-    }
-  )
+    user_pool_client = client.create_user_pool_client(
+        UserPoolId=user_pool_id,
+        AccessTokenValidity=60,
+        RefreshTokenValidity=30,
+        AllowedOAuthFlowsUserPoolClient=False,
+        ClientName='testing',
+        ExplicitAuthFlows=[
+            'ALLOW_CUSTOM_AUTH',
+            'ALLOW_REFRESH_TOKEN_AUTH',
+            'ALLOW_USER_PASSWORD_AUTH',
+            'ALLOW_USER_SRP_AUTH'
+        ],
+        IdTokenValidity=60,
+        GenerateSecret=False,
+        PreventUserExistenceErrors='ENABLED',
+        TokenValidityUnits={
+            'AccessToken': 'minutes',
+            'IdToken': 'minutes',
+            'RefreshToken': 'days'
+        }
+    )
 
-
-  return user_pool_client.get('UserPoolClient')
+    return user_pool_client.get('UserPoolClient')

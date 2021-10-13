@@ -1,17 +1,14 @@
-from typing import Dict
-
 import pytest
 from pytest_mock import MockerFixture
-
-from Contracts import EmailValidator
-from Core.Message import Message
 
 from Domain.Entities.Account import Account
 from Domain.UseCases.Account import StoreAccount
 
+from Presentation.Adapters.Message import Message
 from Presentation.Controllers.SignUpController import SignUpController
 from Presentation.Errors.ValidationError import ValidationError
 
+from Validators.Contracts.EmailValidator import EmailValidator
 
 fake_account = {
     'id': 'valid_id',
@@ -134,7 +131,7 @@ def test_call_email_validator_with_correct_values(
 
     sut.handle(message)
 
-    email_validator_spy.assert_called_once_with(message.body.get('email'))
+    email_validator_spy.assert_called_once_with(message.content.get('email'))
 
 
 def test_raise_when_email_validator_raises(
@@ -173,8 +170,8 @@ def test_call_store_account_with_correct_values(
     sut.handle(message)
 
     store_account_spy.assert_called_once_with(
-        email=message.body.get('email'),
-        password=message.body.get('password')
+        email=message.content.get('email'),
+        password=message.content.get('password')
     )
 
 

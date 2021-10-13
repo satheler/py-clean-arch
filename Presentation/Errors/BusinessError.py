@@ -11,11 +11,11 @@ class BusinessError(BaseError):
 
     def __init__(self, title: str, message: str):
         self.title = title
-        self.message = message
+        super().__init__(message)
 
-    def dict(self):
+    def to_dict(self):
         """Returns the error as a dictionary"""
         return {
             'title': self.title,
-            'message': self.message
+            'message': self.__str__()
         }

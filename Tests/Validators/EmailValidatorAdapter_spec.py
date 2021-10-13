@@ -2,11 +2,13 @@ import re
 import pytest
 from pytest_mock import MockerFixture
 
-from Utils.EmailValidatorAdapter import EmailValidatorAdapter
+from Validators.EmailValidatorAdapter import EmailValidatorAdapter
+
 
 @pytest.fixture
 def sut() -> EmailValidatorAdapter:
-  return EmailValidatorAdapter()
+    return EmailValidatorAdapter()
+
 
 def test_when_invalid_email_is_provided(sut: EmailValidatorAdapter, mocker: MockerFixture):
     """Should return false if email is invalid"""
@@ -31,4 +33,5 @@ def test_call_regex_match(sut: EmailValidatorAdapter, mocker: MockerFixture):
     email = 'valid_email@mail.com'
 
     sut.is_valid(email)
-    re_spy.assert_called_once_with('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$', email)
+    re_spy.assert_called_once_with(
+        '^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$', email)

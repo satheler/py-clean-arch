@@ -1,6 +1,6 @@
 import re
 
-from Contracts import EmailValidator
+from Validators.Contracts.EmailValidator import EmailValidator
 
 
 class EmailValidatorAdapter(EmailValidator):
